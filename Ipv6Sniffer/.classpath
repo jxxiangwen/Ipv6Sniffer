@@ -14,5 +14,8 @@
 	<classpathentry kind="lib" path="D:/GPL/eclipse/plugins/org.eclipse.ui.workbench_3.106.1.v20140827-1737.jar" sourcepath="D:/GPL/eclipse/plugins/org.eclipse.ui.workbench_3.106.1.v20140827-1737.jar"/>
 	<classpathentry kind="lib" path="D:/GPL/eclipse/plugins/com.ibm.icu_52.1.0.v201404241930.jar" sourcepath="D:/GPL/eclipse/plugins/com.ibm.icu_52.1.0.v201404241930.jar"/>
 	<classpathentry kind="lib" path="D:/GPL/eclipse/plugins/org.eclipse.ui.forms_3.6.100.v20140422-1825.jar" sourcepath="D:/GPL/eclipse/plugins/org.eclipse.ui.forms_3.6.100.v20140422-1825.jar"/>
+	<classpathentry kind="lib" path="lib/jpcap.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.17.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
