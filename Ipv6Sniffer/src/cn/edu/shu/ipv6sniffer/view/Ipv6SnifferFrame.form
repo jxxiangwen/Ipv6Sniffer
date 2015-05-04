@@ -47,8 +47,10 @@
                       <Group type="102" alignment="1" attributes="0">
                           <Component id="jLabel1" pref="205" max="32767" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="networkInterface" min="-2" pref="1035" max="-2" attributes="0"/>
+                          <Component id="networkInterface" min="-2" pref="862" max="-2" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <Component id="ipv6Only" min="-2" pref="147" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
                           <Component id="startButton" min="-2" pref="128" max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -64,8 +66,9 @@
                       <Component id="jLabel1" alignment="3" min="-2" pref="49" max="-2" attributes="0"/>
                       <Component id="networkInterface" alignment="3" min="-2" pref="49" max="-2" attributes="0"/>
                       <Component id="startButton" min="-2" pref="49" max="-2" attributes="0"/>
+                      <Component id="ipv6Only" alignment="3" pref="51" max="32767" attributes="0"/>
                   </Group>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" pref="11" max="32767" attributes="0"/>
                   <Component id="jScrollPane1" min="-2" pref="189" max="-2" attributes="0"/>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="jScrollPane2" min="-2" pref="227" max="-2" attributes="0"/>
@@ -181,7 +184,7 @@
                       <EmptySpace min="-2" pref="36" max="-2" attributes="0"/>
                       <Component id="jLabel6" min="-2" pref="99" max="-2" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
-                      <Component id="ipv6Total1" min="-2" pref="85" max="-2" attributes="0"/>
+                      <Component id="packetTotal" min="-2" pref="85" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="jLabel7" min="-2" pref="71" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="43" max="-2" attributes="0"/>
@@ -216,12 +219,12 @@
                               <Component id="jLabel4" alignment="3" min="-2" pref="44" max="-2" attributes="0"/>
                               <Group type="103" alignment="3" groupAlignment="3" attributes="0">
                                   <Component id="jLabel6" alignment="3" min="-2" pref="42" max="-2" attributes="0"/>
-                                  <Component id="ipv6Total1" alignment="3" min="-2" pref="42" max="-2" attributes="0"/>
+                                  <Component id="packetTotal" alignment="3" min="-2" pref="42" max="-2" attributes="0"/>
                                   <Component id="jLabel7" alignment="3" min="-2" pref="44" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
-                      <EmptySpace pref="159" max="32767" attributes="0"/>
+                      <EmptySpace pref="156" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -283,7 +286,7 @@
                 <Property name="text" type="java.lang.String" value="&#x5171;&#x6355;&#x83b7;&#x5305;&#xff1a;"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="ipv6Total1">
+            <Component class="javax.swing.JLabel" name="packetTotal">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="&#x5b8b;&#x4f53;" size="18" style="0"/>
@@ -301,6 +304,14 @@
             </Component>
           </SubComponents>
         </Container>
+        <Component class="javax.swing.JRadioButton" name="ipv6Only">
+          <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="&#x5b8b;&#x4f53;" size="18" style="0"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="&#x5206;&#x6790;&#x5176;&#x4ed6;&#x534f;&#x8bae;"/>
+          </Properties>
+        </Component>
       </SubComponents>
     </Container>
   </SubComponents>

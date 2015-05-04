@@ -91,7 +91,7 @@ public class DateUtil {
 	 * @return
 	 */
 	public static String getLongDate(Date date){
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String strDate = formatter.format(date);
 		return strDate;
 	}

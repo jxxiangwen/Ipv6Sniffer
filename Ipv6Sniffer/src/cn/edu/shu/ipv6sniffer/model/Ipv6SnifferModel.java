@@ -8,13 +8,11 @@ package cn.edu.shu.ipv6sniffer.model;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
-
 import cn.edu.shu.ipv6sniffer.control.Ipv6SnifferControl;
 import jpcap.JpcapCaptor;
-import jpcap.JpcapSender;
 import jpcap.NetworkInterface;
 import jpcap.PacketReceiver;
+import jpcap.packet.ARPPacket;
 import jpcap.packet.IPPacket;
 import jpcap.packet.Packet;
 
@@ -24,8 +22,7 @@ import jpcap.packet.Packet;
  */
 public class Ipv6SnifferModel implements PacketReceiver {
 
-	private static Logger logger = Logger.getLogger(Ipv6SnifferModel.class);
-
+	private static int times = 0;
 	private Ipv6SnifferControl ipv6SnifferControl;
 	private NetworkInterface[] devices;// 存储所有网卡
 	private NetworkInterface device;// 需要监控的网卡
@@ -35,8 +32,7 @@ public class Ipv6SnifferModel implements PacketReceiver {
 	private boolean promisc = false;// 是否过滤（Mac地址不是当前网卡的IP数据包）
 	private int timeout = 10000;// 设置超时为10秒
 	private JpcapCaptor jpcap;
-	private JpcapSender sender;
-	private ArrayList<Packet> packetList = new ArrayList<Packet>(100);// 存储抓取到的包
+	private volatile ArrayList<Packet> packetList = new ArrayList<Packet>(100);// 存储抓取到的包
 
 	/**
 	 * 通过捕捉器捕获数据有两种方式： 1.回调方法
@@ -49,8 +45,10 @@ public class Ipv6SnifferModel implements PacketReceiver {
 	private volatile int packetTotal = 0;// 总包数
 	private volatile int ipv4Total = 0;// 总ipv4数
 	private volatile int ipv6Total = 0;// 总ipv6数
+	private volatile int arpTotal = 0;// 总arp数
 	private volatile int tcpTotal = 0;// 总tcp数
 	private volatile int udpTotal = 0;// 总udp数
+	private boolean ipv6Only = true;// 是否解析其他协议
 
 	public Ipv6SnifferModel(Ipv6SnifferControl ipv6SnifferControl) {
 		super();
@@ -78,8 +76,8 @@ public class Ipv6SnifferModel implements PacketReceiver {
 				this.timeout); // 打开与设备的连接
 		jpcap.setNonBlockingMode(this.isNonBlockingMode);
 		// 只监听IP数据包
-		//jpcap.setFilter("ip", true); // 只监听B的IP数据包
-		sender = jpcap.getJpcapSenderInstance();
+		// jpcap.setFilter("ip", true); // 只监听B的IP数据包
+		// sender = jpcap.getJpcapSenderInstance();
 		return device;
 	}
 
@@ -103,8 +101,7 @@ public class Ipv6SnifferModel implements PacketReceiver {
 		}
 
 		// 清空包列表中的包
-		this.packetList.clear();
-		this.packetList.ensureCapacity(100);
+		this.packetList = new ArrayList<Packet>(100);
 	}
 
 	/**
@@ -112,7 +109,7 @@ public class Ipv6SnifferModel implements PacketReceiver {
 	 * @return
 	 */
 	public boolean startCapture() {
-		
+
 		System.out.println("监控的网卡是：" + this.device.description);
 		// 声明一个IPPacket类
 		// IPPacket ipPacket = null;
@@ -134,6 +131,8 @@ public class Ipv6SnifferModel implements PacketReceiver {
 	public boolean stopCapture() {
 		this.jpcap.breakLoop();
 		this.jpcap.close();
+		System.out.println("times : " + times);
+		System.out.println("length : " + this.packetList.size());
 		return true;
 	}
 
@@ -165,7 +164,8 @@ public class Ipv6SnifferModel implements PacketReceiver {
 
 	/**
 	 * @decription 实现PacketReceiver接口必须实现的函数，用于对接收的包进行处理
-	 * @param packet 捕获的包
+	 * @param packet
+	 *            捕获的包
 	 * @return
 	 */
 	@Override
@@ -173,38 +173,60 @@ public class Ipv6SnifferModel implements PacketReceiver {
 		// TODO Auto-generated method stub
 		if (packet == null)// 没有包，返回
 			return;
+		synchronized (packetList) {
+			addPacket(packet);
+		}
+	}
+
+	public synchronized void addPacket(Packet packet) {
 		// 更新统计数据
 		this.jpcap.updateStat();
 		this.bytesTotal += packet.len;
 		this.packetTotal++;
-
 		if (packet instanceof IPPacket) {
 
 			if (((IPPacket) packet).version == 4) {
-				this.ipv4Total++;//ipv4包
-				//System.out.println("ipv4包");
+				this.ipv4Total++;// ipv4包
+				if (!this.ipv6Only) {
+					times++;
+					// 将新的包加入列表
+					this.packetList.add(packet);
+					this.ipv6SnifferControl.addNewPacket(
+							this.packetList.size() - 1, packet);
+				}
 			}
 
 			if (((IPPacket) packet).version == 6) {
-				this.ipv6Total++;//ipv6包
-				// 传递给controller
+				this.ipv6Total++;// ipv6包
+				times++;
+				// 将新的包加入列表
 				this.packetList.add(packet);
-				//获得新的包，刷新view层表格
-				this.ipv6SnifferControl.addNewPacket(this.packetList.size() - 1, packet);
+				// 获得新的ipv6包，刷新view层表格
+				this.ipv6SnifferControl.addNewPacket(
+						this.packetList.size() - 1, packet);
 			}
 
 			switch (((IPPacket) packet).protocol) {
 			case IPPacket.IPPROTO_TCP:
-				this.tcpTotal++;//tcp报文
+				this.tcpTotal++;// tcp报文
 				break;
 			case IPPacket.IPPROTO_UDP:
-				this.udpTotal++;//udp报文
+				this.udpTotal++;// udp报文
 				break;
 
 			}
+		} else if (packet instanceof ARPPacket) {
+			this.arpTotal++;
+			if (!this.ipv6Only) {
+				times++;
+				// 将新的包加入列表
+				this.packetList.add(packet);
+				this.ipv6SnifferControl.addNewPacket(
+						this.packetList.size() - 1, packet);
+			}
 		}
-
 		System.out.println("捕获的报文数据： " + packet);
+
 	}
 
 	public int getDeviceIndex() {
@@ -267,5 +289,21 @@ public class Ipv6SnifferModel implements PacketReceiver {
 	public void setUdpTotal(int udpTotal) {
 		this.udpTotal = udpTotal;
 	}
-	
+
+	public int getArpTotal() {
+		return arpTotal;
+	}
+
+	public void setArpTotal(int arpTotal) {
+		this.arpTotal = arpTotal;
+	}
+
+	public boolean isIpv6Only() {
+		return ipv6Only;
+	}
+
+	public void setIpv6Only(boolean ipv6Only) {
+		this.ipv6Only = ipv6Only;
+	}
+
 }
